@@ -4,7 +4,6 @@ import pandas as pd
 # CONFIG
 # ------------------------------------------------------------
 PATH = "data/distance_matrix_f1.xlsx"   # change if needed
-ROUNDTRIP = False                      # set True to add last -> first
 
 # ------------------------------------------------------------
 # 1) Load the distance matrix from Excel
@@ -29,20 +28,25 @@ if missing_cols:
     )
 
 # ------------------------------------------------------------
-# 3) Calculate distances in the given order: route[0] -> route[1] -> ... -> route[-1]
+# Ask user: roundtrip or not
 # ------------------------------------------------------------
-legs = []          # will store (from, to, distance)
+roundtrip = input("Roundtrip? y/n [n]: ").strip().lower() == "y"
+
+# ------------------------------------------------------------
+# 3) Calculate distances in the given order
+# ------------------------------------------------------------
+legs = []
 total = 0.0
 
 for i in range(len(route) - 1):
     a = route[i]
     b = route[i + 1]
-    dist = float(D.loc[a, b])          # distance from a to b from the matrix
+    dist = float(D.loc[a, b])
     legs.append((a, b, dist))
     total += dist
 
-# Optionally add the return leg (last -> first)
-if ROUNDTRIP and len(route) >= 2:
+# Optionally add return leg (last -> first)
+if roundtrip and len(route) >= 2:
     a = route[-1]
     b = route[0]
     dist = float(D.loc[a, b])

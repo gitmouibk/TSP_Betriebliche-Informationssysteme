@@ -54,8 +54,9 @@ def nn_tsp(D, nodes, roundtrip=True):
 
     # While there are still nodes left to visit
     while unvisited:
-        # Choose the nearest unvisited neighbor
-        nxt = D.loc[cur, list(unvisited)].idxmin()
+        # Choose the nearest unvisited neighbor (deterministic tie-break)
+        candidates = sorted(unvisited)
+        nxt = D.loc[cur, candidates].astype(float).idxmin()
 
         # Add distance to total
         total += float(D.loc[cur, nxt])

@@ -127,7 +127,7 @@ def cheapest_insertion_tsp(D: pd.DataFrame, nodes: list[str], roundtrip: bool = 
         best_delta = float("inf")
 
         # Try inserting each unvisited node x into every edge (a -> b)
-        for x in unvisited:
+        for x in sorted(unvisited):  # <-- deterministic order
             for i in range(len(tour) - 1):
                 a = tour[i]
                 b = tour[i + 1]
@@ -160,7 +160,9 @@ def cheapest_insertion_tsp(D: pd.DataFrame, nodes: list[str], roundtrip: bool = 
         a = tour[i]
         b = tour[i + 1]
         cost = float(D.loc[a, b])
-        if cost < best_break_cost:
+
+        # deterministic tie-break if equal cost: choose smaller index
+        if cost < best_break_cost or (cost == best_break_cost and (best_break_i is None or i < best_break_i)):
             best_break_cost = cost
             best_break_i = i
 
@@ -203,6 +205,25 @@ sub = D.loc[nodes, nodes]
 
 # Run cheapest insertion heuristic
 path, total = cheapest_insertion_tsp(sub, nodes, roundtrip=roundtrip)
+
+# -------------------------------------------------------------------
+# FORCE OUTPUT TO START AT ALBERT PARK (works for roundtrip AND open path)
+# -------------------------------------------------------------------
+START_KEY = "albert park"
+start_node = next((n for n in path if START_KEY in str(n).lower()), None)
+
+if start_node is not None:
+    if roundtrip:
+        cycle = path[:-1]
+        k = cycle.index(start_node)
+        cycle = cycle[k:] + cycle[:k]
+        path = cycle + [cycle[0]]
+        # total remains correct for same cycle length
+    else:
+        k = path.index(start_node)
+        path = path[k:] + path[:k]
+        # recompute total because edges changed after rotation
+        total = sum(float(sub.loc[a, b]) for a, b in zip(path[:-1], path[1:]))
 
 # -------------------------------------------------------------------
 # OUTPUT RESULTS
