@@ -169,22 +169,30 @@ rt_choice = (input("Roundtrip? y/n [y]: ").strip().lower() != "n")
 res_p, res_m, td, tc, tc_n, pc_n = nn_tsp(D, nodes, regions_map, rt_choice)
 
 # -------------------------------------------------------------------
-# 6. FINAL RESULTS
+# 6. FINAL RESULTS 
 # -------------------------------------------------------------------
 print("\n" + "="*60)
 print("EXTENDED LOGISTICS REPORT (NEAREST NEIGHBOUR)")
 print("="*60)
-# Showing the user exactly what parameters were used for this specific result
-print(f"  Optimization: Time ({W_DIST*100:.0f}%) vs. Budget ({W_COST*100:.0f}%)")
-print(f"  Normalizer: {COST_NORMALIZER}")
+print("SYSTEM PARAMETERS (Active for this run):")
+print(f"  Optimization Priority: Time ({W_DIST*100:.0f}%) vs. Budget ({W_COST*100:.0f}%)")
+print(f"  Normalizer: {COST_NORMALIZER} (Balances Euros and Kilometers)")
+
+print(f"  Truck: Baseline Speed (100% perceived distance)")
+print(f"  Plane: High-Speed Mode ({P_SPEED_MULT*100:.0f}% perceived distance)")
+print(f"         -> This represents a {(1-P_SPEED_MULT)*100:.0f}% reduction in travel time.")
+
+print(f"\n  Financials:")
+print(f"  - Truck: €{T_FIX} Fixed + €{T_VAR}/km")
+print(f"  - Plane: €{P_FIX} Fixed + €{P_VAR}/km (subject to non-linear scaling)")
 print("-" * 60)
 
-# Printing the leg-by-leg route
+print("ROUTE DETAILS:")
 for i in range(len(res_m)):
     print(f"  {res_p[i]} -> {res_p[i+1]} ({res_m[i]})")
     
 print("-" * 60)
 print(f"TOTAL DISTANCE: {td:,.0f} km")
 print(f"TOTAL COST:     € {tc:,.2f}")
-print(f"STATS: {tc_n}x Truck, {pc_n}x Plane")
+print(f"LOGISTICS STATS: {tc_n}x Truck, {pc_n}x Plane")
 print("="*60)
